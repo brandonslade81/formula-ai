@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 import os
 
-# Get OpenAI API key from environment variable
+# Get API key from environment variable
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 st.title("Formula AI")
@@ -14,12 +14,14 @@ if st.button("Generate Formula"):
     if user_input:
         with st.spinner("Generating formula…"):
             try:
-                response = openai.Completion.create(
-                    engine="text-davinci-003",
-                    prompt=f"Write an Excel formula for: {user_input}",
-                    max_tokens=100
+                response = openai.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are an Excel formula generator."},
+                        {"role": "user", "content": f"Write an Excel formula for: {user_input}"}
+                    ]
                 )
-                formula = response.choices[0].text.strip()
+                formula = response.choices[0].message.content.strip()
                 st.code(formula)
             except Exception as e:
                 st.error(f"Error: {e}")
